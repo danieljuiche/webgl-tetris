@@ -3,15 +3,29 @@ var canvas;
 var gl;
 
 // Three Vertices        
-var vertices = [
-        vec2(  0, 0 ),
-        vec2(  0.5,  1 ),
-        vec2(  1, 0 ),
-        vec2(  -1, -1 ),
-        vec2(  -0.5,  0 ),
-        vec2(  0, -1 ),
-];    
+var vertices = [];
 
+// Outer grid padding in percentage
+var outerGridPadding = 0.01;
+var padding = outerGridPadding * 2;
+
+var numberOfCols = 10;
+var numberOfRows = 20;
+
+// Draw grid rows
+var rowGridSpacing = (2 - padding * 2) / numberOfRows;
+var colGridSpacing = (2 - padding * 2) / numberOfCols;
+
+// Draw grid
+for (var i = 0; i <= numberOfRows; i++) {
+    vertices.push(vec2(-1 + padding, -1 + padding + i*rowGridSpacing));
+    vertices.push(vec2(1 - padding, -1 + padding + i*rowGridSpacing));
+}
+
+for (var i = 0; i <= numberOfCols; i++) {
+    vertices.push(vec2(-1+padding + i*colGridSpacing, 1-padding));
+    vertices.push(vec2(-1+padding + i*colGridSpacing, -1+padding));
+}
 
 window.onload = function init() {
 
@@ -40,11 +54,15 @@ window.onload = function init() {
     var vPosition = gl.getAttribLocation( program, "vPosition" );
     gl.vertexAttribPointer( vPosition, 2, gl.FLOAT, false, 0, 0 );
     gl.enableVertexAttribArray( vPosition );
-     
+    
     render();
 };
 
 function render() {
     gl.clear( gl.COLOR_BUFFER_BIT ); 
-    gl.drawArrays( gl.TRIANGLES, 0, vertices.length );
+    gl.drawArrays( gl.LINES, 0, vertices.length );
 }
+
+// Figure out how to draw a line across the top of the screen
+// Figure out how to draw a grid
+
