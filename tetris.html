@@ -12,10 +12,11 @@
 
 <script id="fragment-shader" type="x-shader/x-fragment">
 	precision mediump float;
+	uniform vec4 uColor;
 
 	void main()
 	{
-		gl_FragColor = vec4( 0.827, 0.827, 0.827, 1.0 );
+		gl_FragColor = uColor;
 	}
 </script>
 
