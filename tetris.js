@@ -398,17 +398,33 @@ function render() {
 
     drawCurrentBlock();
 
-    checkBlockCoordinates();
+    checkStackCollision();
     drawGameBoard();
 
     drawGridLines();
     window.requestAnimFrame(render);
 }
 
-function checkBlockCoordinates() {
+function checkStackCollision() {
+    // Check for collisions on each individual square of the tetrimino
     for (var coordinates in currentBlock.location) {
-        if (currentBlock.location[coordinates][1] < -1) {
+        var xCoord = currentBlock.location[coordinates][0];
+        var yCoord = currentBlock.location[coordinates][1];
+
+        // Check to see if tetrimino hits the floor
+        if (yCoord == 0) {
+            // Update gameboard to include tetrimino piece
+            for (var coordinates in currentBlock.location) {
+                var xCoord = currentBlock.location[coordinates][0];
+                var yCoord = currentBlock.location[coordinates][1];
+                
+                gameBoardState[xCoord][yCoord].occupied = true;
+                gameBoardState[xCoord][yCoord].color = currentBlock.color;
+            }
+
             newBlockRequired = true;
+
+            break;
         }
     }
 }
@@ -418,7 +434,7 @@ function drawGameBoard() {
         for (var j = 0; j < numberOfRows; j++) {
             var gridSpot = gameBoardState[i][j];
 
-            if (gridSpot.occupied === false) {
+            if (gridSpot.occupied === true) {
                 var vBuffer = gl.createBuffer();
                 gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
                 gl.bufferData(gl.ARRAY_BUFFER, flatten(gridSpot.cornerCoordinates), gl.STATIC_DRAW );
