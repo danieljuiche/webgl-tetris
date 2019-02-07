@@ -304,13 +304,24 @@ function drawCurrentBlock() {
     }
 
     for (var block in currentBlock.location) {
-        currentBlock.cornerCoordinates.push(convertCornerCoords(currentBlock.location[block][0] - 1, currentBlock.location[block][1] - 1));
-        currentBlock.cornerCoordinates.push(convertCornerCoords(currentBlock.location[block][0] - 1, currentBlock.location[block][1]));
-        currentBlock.cornerCoordinates.push(convertCornerCoords(currentBlock.location[block][0], currentBlock.location[block][1]));
+        // currentBlock.cornerCoordinates.push(convertCornerCoords(currentBlock.location[block][0] - 1, currentBlock.location[block][1] - 1));
+        // currentBlock.cornerCoordinates.push(convertCornerCoords(currentBlock.location[block][0] - 1, currentBlock.location[block][1]));
+        // currentBlock.cornerCoordinates.push(convertCornerCoords(currentBlock.location[block][0], currentBlock.location[block][1]));
 
-        currentBlock.cornerCoordinates.push(convertCornerCoords(currentBlock.location[block][0] - 1, currentBlock.location[block][1] - 1));
+        // currentBlock.cornerCoordinates.push(convertCornerCoords(currentBlock.location[block][0] - 1, currentBlock.location[block][1] - 1));
+        // currentBlock.cornerCoordinates.push(convertCornerCoords(currentBlock.location[block][0], currentBlock.location[block][1]));
+        // currentBlock.cornerCoordinates.push(convertCornerCoords(currentBlock.location[block][0], currentBlock.location[block][1] - 1));
+        
+
+        // 0, 1, 2
+        // 0, 2, 3
         currentBlock.cornerCoordinates.push(convertCornerCoords(currentBlock.location[block][0], currentBlock.location[block][1]));
-        currentBlock.cornerCoordinates.push(convertCornerCoords(currentBlock.location[block][0], currentBlock.location[block][1] - 1));
+        currentBlock.cornerCoordinates.push(convertCornerCoords(currentBlock.location[block][0], currentBlock.location[block][1]+1));
+        currentBlock.cornerCoordinates.push(convertCornerCoords(currentBlock.location[block][0]+1, currentBlock.location[block][1]+1));
+
+        currentBlock.cornerCoordinates.push(convertCornerCoords(currentBlock.location[block][0], currentBlock.location[block][1]));
+        currentBlock.cornerCoordinates.push(convertCornerCoords(currentBlock.location[block][0]+1, currentBlock.location[block][1]+1));
+        currentBlock.cornerCoordinates.push(convertCornerCoords(currentBlock.location[block][0]+1, currentBlock.location[block][1]));
 
     }
 
@@ -369,7 +380,17 @@ function render() {
     drawCurrentBlock();    
     drawGridLines();
 
+    checkBlockCoordinates();
+
     window.requestAnimFrame(render);
+}
+
+function checkBlockCoordinates() {
+    for (var coordinates in currentBlock.location) {
+        if (currentBlock.location[coordinates][1] < -1) {
+            newBlockRequired = true;
+        }
+    }
 }
 
 function drawGridLines() {
