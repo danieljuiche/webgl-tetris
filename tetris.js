@@ -38,7 +38,6 @@ function lowerTetrisPiece() {
 
 var newBlockRequired = true;
 
-
 // Orientations
 var tetriminoPieces = [
     {
@@ -263,14 +262,15 @@ var selectedBlock = {};
 function selectCurrentBlock() {
     if (newBlockRequired) {
         // Display it in random location
-        var initialLocation = [6, 19];
+        var randInitialX = 2 + Math.floor(Math.random() * (numberOfCols - 3));
+
+        var initialLocation = [randInitialX, 19];
 
         // Randomly select piece
         var randPieceInt = Math.floor(Math.random() * tetriminoPieces.length);
         selectedBlock = tetriminoPieces[randPieceInt];
 
         var randomStyleInt = Math.floor(Math.random() * selectedBlock.styles.length);
-
 
         currentBlock.type = selectedBlock.type;
         currentBlock.centerOfRotation = initialLocation;
@@ -391,14 +391,3 @@ function drawGridLines() {
 
     gl.drawArrays( gl.LINES, 0, gridVertices.length);
 }
-
-// Example we are given in class uses flatten function. Can we include it here? Yes
-// Is it possible to split up the draw arrays command? Or do I have to put everything into one buffer? It is possible to split up
-// How do I separate my game logic? How do I set up my game board? What does the data structure look like?
-
-
-// How do I set up my tetris pieces and then convert them into clip space coords?
-
-// Unsure of how to set up my render function, how to manage game state with render?
-
-// How do I incorporate color?
