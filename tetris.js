@@ -54,7 +54,7 @@ var tetriminoPieces = [
                 ]
             }
         ],
-        color: vec4(1.0, 0.0, 0.0, 1.0)
+        color: vec4(1.0, 1.0, 0.0, 1.0)
     },
     {
         type: "iPiece",
@@ -78,7 +78,7 @@ var tetriminoPieces = [
                 ]
             }
         ],
-        color: vec4(0.0, 0.0, 1.0, 1.0)
+        color: vec4(0.0, 1.0, 1.0, 1.0)
     },
     {
         type: "sPiece",
@@ -126,7 +126,133 @@ var tetriminoPieces = [
                 ]
             }
         ],
-        color: vec4(0.0, 1.0, 0.0, 1.0)
+        color: vec4(1.0, 0.0, 0.0, 1.0)
+    },
+    {
+        type: "lPiece",
+        styles: [
+            {
+                type: 1,
+                orientation: [
+                    vec2(0, 0),
+                    vec2(-1, 0),
+                    vec2(1, 0),
+                    vec2(-1, -1)
+                ]
+            },
+            {
+                type: 2,
+                orientation: [
+                    vec2(0, 0),
+                    vec2(0, -1),
+                    vec2(0, 1),
+                    vec2(1, -1)
+                ]
+            },
+            {
+                type: 3,
+                orientation: [
+                    vec2(0, 0),
+                    vec2(-1, 0),
+                    vec2(1, 0),
+                    vec2(1, 1)
+                ]
+            },
+            {
+                type: 4,
+                orientation: [
+                    vec2(0, 0),
+                    vec2(0, -1),
+                    vec2(0, 1),
+                    vec2(-1, 1)
+                ]
+            }
+        ],
+        color: vec4(1.0, 0.631, 0.0, 1.0)
+    },
+    {
+        type: "jPiece",
+        styles: [
+            {
+                type: 1,
+                orientation: [
+                    vec2(0, 0),
+                    vec2(-1, 0),
+                    vec2(1, 0),
+                    vec2(1, -1)
+                ]
+            },
+            {
+                type: 2,
+                orientation: [
+                    vec2(0, 0),
+                    vec2(0, -1),
+                    vec2(0, 1),
+                    vec2(1, 1)
+                ]
+            },
+            {
+                type: 3,
+                orientation: [
+                    vec2(0, 0),
+                    vec2(-1, 0),
+                    vec2(-1, 1),
+                    vec2(1, 0)
+                ]
+            },
+            {
+                type: 4,
+                orientation: [
+                    vec2(0, 0),
+                    vec2(0, -1),
+                    vec2(0, 1),
+                    vec2(-1, -1)
+                ]
+            }
+        ],
+        color: vec4(0.169, 0.0, 1.0, 1.0)
+    },
+    {
+        type: "tPiece",
+        styles: [
+            {
+                type: 1,
+                orientation: [
+                    vec2(0, 0),
+                    vec2(-1, 0),
+                    vec2(1, 0),
+                    vec2(0, -1)
+                ]
+            },
+            {
+                type: 2,
+                orientation: [
+                    vec2(0, 0),
+                    vec2(0, -1),
+                    vec2(0, 1),
+                    vec2(1, 0)
+                ]
+            },
+            {
+                type: 3,
+                orientation: [
+                    vec2(0, 0),
+                    vec2(-1, 0),
+                    vec2(1, 0),
+                    vec2(0, 1)
+                ]
+            },
+            {
+                type: 4,
+                orientation: [
+                    vec2(0, 0),
+                    vec2(0, -1),
+                    vec2(0, 1),
+                    vec2(-1, 0)
+                ]
+            }
+        ],
+        color: vec4(0.737, 0.0, 1.0, 1.0)
     },
 ];
 
@@ -137,7 +263,7 @@ var selectedBlock = {};
 function selectCurrentBlock() {
     if (newBlockRequired) {
         // Display it in random location
-        var initialLocation = [6, 20];
+        var initialLocation = [6, 19];
 
         // Randomly select piece
         var randPieceInt = Math.floor(Math.random() * tetriminoPieces.length);
