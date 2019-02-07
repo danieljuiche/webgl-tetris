@@ -79,7 +79,55 @@ var tetriminoPieces = [
             }
         ],
         color: vec4(0.0, 0.0, 1.0, 1.0)
-    }
+    },
+    {
+        type: "sPiece",
+        styles: [
+            {
+                type: 1,
+                orientation: [
+                    vec2(0, 0),
+                    vec2(1, 0),
+                    vec2(0, -1),
+                    vec2(-1, -1)
+                ]
+            },
+            {
+                type: 2,
+                orientation: [
+                    vec2(0, 0),
+                    vec2(0, 1),
+                    vec2(1, 0),
+                    vec2(1, -1)
+                ]
+            }
+        ],
+        color: vec4(0.0, 1.0, 0.0, 1.0)
+    },
+    {
+        type: "zPiece",
+        styles: [
+            {
+                type: 1,
+                orientation: [
+                    vec2(0, 0),
+                    vec2(-1, 0),
+                    vec2(0, -1),
+                    vec2(1, -1)
+                ]
+            },
+            {
+                type: 2,
+                orientation: [
+                    vec2(0, 0),
+                    vec2(0, -1),
+                    vec2(1, 0),
+                    vec2(1, 1)
+                ]
+            }
+        ],
+        color: vec4(0.0, 1.0, 0.0, 1.0)
+    },
 ];
 
 // Initialize 
@@ -88,16 +136,19 @@ var selectedBlock = {};
 
 function selectCurrentBlock() {
     if (newBlockRequired) {
+        // Display it in random location
+        var initialLocation = [6, 20];
+
         // Randomly select piece
         var randPieceInt = Math.floor(Math.random() * tetriminoPieces.length);
         selectedBlock = tetriminoPieces[randPieceInt];
 
-        // Display it in random location
-        var initialLocation = [6, 20];
+        var randomStyleInt = Math.floor(Math.random() * selectedBlock.styles.length);
+
 
         currentBlock.type = selectedBlock.type;
         currentBlock.centerOfRotation = initialLocation;
-        currentBlock.orientation = selectedBlock.styles[0].orientation;
+        currentBlock.orientation = selectedBlock.styles[randomStyleInt].orientation;
         currentBlock.color = selectedBlock.color;
         currentBlock.location = [];
         currentBlock.cornerCoordinates = [];
@@ -108,8 +159,8 @@ function selectCurrentBlock() {
 
 
 function convertCornerCoords(x, y) {
-    var xCoord = x/numberOfCols * 1 + (numberOfCols - x)/(numberOfCols) * -1;
-    var yCoord = y/numberOfRows * 1 + (numberOfRows - y)/(numberOfRows) * -1;
+    var xCoord = (x/numberOfCols * 1) + ((numberOfCols - x)/(numberOfCols) * -1);
+    var yCoord = (y/numberOfRows * 1) + ((numberOfRows - y)/(numberOfRows) * -1);
     return vec2(xCoord, yCoord);
 }
 
@@ -127,10 +178,14 @@ function drawCurrentBlock() {
     }
 
     for (var block in currentBlock.location) {
+        currentBlock.cornerCoordinates.push(convertCornerCoords(currentBlock.location[block][0] - 1, currentBlock.location[block][1] - 1));
+        currentBlock.cornerCoordinates.push(convertCornerCoords(currentBlock.location[block][0] - 1, currentBlock.location[block][1]));
+        currentBlock.cornerCoordinates.push(convertCornerCoords(currentBlock.location[block][0], currentBlock.location[block][1]));
+
+        currentBlock.cornerCoordinates.push(convertCornerCoords(currentBlock.location[block][0] - 1, currentBlock.location[block][1] - 1));
         currentBlock.cornerCoordinates.push(convertCornerCoords(currentBlock.location[block][0], currentBlock.location[block][1]));
         currentBlock.cornerCoordinates.push(convertCornerCoords(currentBlock.location[block][0], currentBlock.location[block][1] - 1));
-        currentBlock.cornerCoordinates.push(convertCornerCoords(currentBlock.location[block][0] - 1, currentBlock.location[block][1]));
-        currentBlock.cornerCoordinates.push(convertCornerCoords(currentBlock.location[block][0] - 1, currentBlock.location[block][1] - 1));
+
     }
 
     var vBuffer = gl.createBuffer();
@@ -149,7 +204,7 @@ function drawCurrentBlock() {
     var colorUniformLocation = gl.getUniformLocation(program, "uColor");
     gl.uniform4f(colorUniformLocation, currentBlock.color[0], currentBlock.color[1], currentBlock.color[2], currentBlock.color[3]);
 
-    gl.drawArrays(gl.TRIANGLE_STRIP, 0, currentBlock.cornerCoordinates.length);
+    gl.drawArrays(gl.TRIANGLES, 0, currentBlock.cornerCoordinates.length);
 }
 
 window.onload = function init() {
