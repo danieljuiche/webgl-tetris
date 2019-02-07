@@ -37,8 +37,38 @@ function lowerTetrisPiece() {
 }
 
 var newBlockRequired = true;
+var gameBoardState = [];
 
-// Orientations
+for (var i = 0; i < numberOfCols; i++) {
+    var tempArray = [];
+    for (var j = 0; j < numberOfRows; j++) {
+        tempArray.push({
+            occupied: false,
+            color: vec4(Math.random(), Math.random(), Math.random(), 1.0),
+            location: [i,j],
+            cornerCoordinates: [
+                convertCornerCoords(i,j),
+                convertCornerCoords(i, j+1),
+                convertCornerCoords(i+1, j+1),
+                convertCornerCoords(i,j),
+                convertCornerCoords(i+1, j+1),
+                convertCornerCoords(i+1, j)
+            ]
+        });
+    }
+    gameBoardState.push(tempArray);
+}
+
+// Testing game board
+// gameBoardState[0][0].color = vec4(1,1,1,1);
+// gameBoardState[1][2].color = vec4(1,1,1,1);
+// gameBoardState[4][3].color = vec4(1,1,1,1);
+
+
+// ...................... //
+// Tetrimino Orientations //
+// ...................... //
+
 var tetriminoPieces = [
     {
         type: "oPiece",
@@ -304,17 +334,6 @@ function drawCurrentBlock() {
     }
 
     for (var block in currentBlock.location) {
-        // currentBlock.cornerCoordinates.push(convertCornerCoords(currentBlock.location[block][0] - 1, currentBlock.location[block][1] - 1));
-        // currentBlock.cornerCoordinates.push(convertCornerCoords(currentBlock.location[block][0] - 1, currentBlock.location[block][1]));
-        // currentBlock.cornerCoordinates.push(convertCornerCoords(currentBlock.location[block][0], currentBlock.location[block][1]));
-
-        // currentBlock.cornerCoordinates.push(convertCornerCoords(currentBlock.location[block][0] - 1, currentBlock.location[block][1] - 1));
-        // currentBlock.cornerCoordinates.push(convertCornerCoords(currentBlock.location[block][0], currentBlock.location[block][1]));
-        // currentBlock.cornerCoordinates.push(convertCornerCoords(currentBlock.location[block][0], currentBlock.location[block][1] - 1));
-        
-
-        // 0, 1, 2
-        // 0, 2, 3
         currentBlock.cornerCoordinates.push(convertCornerCoords(currentBlock.location[block][0], currentBlock.location[block][1]));
         currentBlock.cornerCoordinates.push(convertCornerCoords(currentBlock.location[block][0], currentBlock.location[block][1]+1));
         currentBlock.cornerCoordinates.push(convertCornerCoords(currentBlock.location[block][0]+1, currentBlock.location[block][1]+1));
@@ -377,11 +396,12 @@ function render() {
 
     selectCurrentBlock();
 
-    drawCurrentBlock();    
-    drawGridLines();
+    drawCurrentBlock();
 
     checkBlockCoordinates();
+    drawGameBoard();
 
+    drawGridLines();
     window.requestAnimFrame(render);
 }
 
@@ -389,6 +409,34 @@ function checkBlockCoordinates() {
     for (var coordinates in currentBlock.location) {
         if (currentBlock.location[coordinates][1] < -1) {
             newBlockRequired = true;
+        }
+    }
+}
+
+function drawGameBoard() {
+    for (var i = 0; i < numberOfCols; i++) {
+        for (var j = 0; j < numberOfRows; j++) {
+            var gridSpot = gameBoardState[i][j];
+
+            if (gridSpot.occupied === false) {
+                var vBuffer = gl.createBuffer();
+                gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
+                gl.bufferData(gl.ARRAY_BUFFER, flatten(gridSpot.cornerCoordinates), gl.STATIC_DRAW );
+
+                // Associate our shader variables with our data buffer
+                var vPosition = gl.getAttribLocation( program, "vPosition" );
+                gl.vertexAttribPointer( vPosition, 2, gl.FLOAT, false, 0, 0 );
+                gl.enableVertexAttribArray( vPosition );
+
+                var cBuffer = gl.createBuffer();
+                gl.bindBuffer(gl.ARRAY_BUFFER, cBuffer);
+                gl.bufferData(gl.ARRAY_BUFFER, flatten(gridSpot.color), gl.STATIC_DRAW);
+                
+                var colorUniformLocation = gl.getUniformLocation(program, "uColor");
+                gl.uniform4f(colorUniformLocation, gridSpot.color[0], gridSpot.color[1], gridSpot.color[2], gridSpot.color[3]);
+
+                gl.drawArrays(gl.TRIANGLES, 0, gridSpot.cornerCoordinates.length);
+            }
         }
     }
 }
