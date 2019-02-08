@@ -32,7 +32,7 @@ for (var i = 0; i <= numberOfCols; i++) {
 
 
 // Set up timer
-window.setInterval(lowerTetrisPiece, 100);
+window.setInterval(lowerTetrisPiece, 700);
 function lowerTetrisPiece() {
     for (var coordinates in currentBlock.location) {
         var xCoord = currentBlock.location[coordinates][0];
@@ -58,6 +58,28 @@ function lowerTetrisPiece() {
     // lowerTetrisPieceFlag = true;
     // console.log(currentBlock.centerOfRotation);
 }
+
+
+window.addEventListener("keydown", getKey, false);
+
+function getKey (key) {
+    if (key.key === "ArrowDown") {
+        console.log(currentBlock.type);
+        tetriminoPieces.forEach(function(piece) {
+            if (piece.type === currentBlock.type) {
+                var newStyleNum = (currentBlock.styleNum + 1) % piece.styles.length;
+                currentBlock.orientation = selectedBlock.styles[newStyleNum].orientation;
+                currentBlock.styleNum = newStyleNum;
+            }
+        });
+        console.log("Key pressed");
+    }
+
+    // if (key.key === "ArrowUp") {
+        
+    // }
+}
+
 
 var newBlockRequired = true;
 var gameBoardState = [];
@@ -326,6 +348,7 @@ function selectCurrentBlock() {
         var randomStyleInt = Math.floor(Math.random() * selectedBlock.styles.length);
 
         currentBlock.orientation = selectedBlock.styles[randomStyleInt].orientation;
+        currentBlock.styleNum = randomStyleInt;
 
         for (var i = 0; i < currentBlock.orientation.length; i++) {
             console.log(currentBlock.orientation[i][1]);
@@ -335,6 +358,7 @@ function selectCurrentBlock() {
                 break;
             }
         }
+
         currentBlock.type = selectedBlock.type;
         currentBlock.centerOfRotation = initialLocation;
         currentBlock.color = selectedBlock.color;
