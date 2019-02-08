@@ -17,6 +17,8 @@ var numberOfRows = 20;
 var rowGridSpacing = (2 - padding * 2) / numberOfRows;
 var colGridSpacing = (2 - padding * 2) / numberOfCols;
 
+var lowerTetrisPieceFlag = true;
+
 // Draw grid
 for (var i = 0; i <= numberOfRows; i++) {
     gridVertices.push(vec2(-1 + padding, -1 + padding + i*rowGridSpacing));
@@ -30,10 +32,31 @@ for (var i = 0; i <= numberOfCols; i++) {
 
 
 // Set up timer
-window.setInterval(lowerTetrisPiece, 700);
+window.setInterval(lowerTetrisPiece, 100);
 function lowerTetrisPiece() {
-    currentBlock.centerOfRotation[1]--;
-    console.log(currentBlock.centerOfRotation);
+    for (var coordinates in currentBlock.location) {
+        var xCoord = currentBlock.location[coordinates][0];
+        var yCoord = currentBlock.location[coordinates][1];
+
+        if (gameBoardState[xCoord][yCoord-1].occupied === true) {
+            for (var coordinates in currentBlock.location) {
+                var xCoord = currentBlock.location[coordinates][0];
+                var yCoord = currentBlock.location[coordinates][1];
+
+                gameBoardState[xCoord][yCoord].occupied = true;
+                gameBoardState[xCoord][yCoord].color = currentBlock.color;
+            }
+
+            newBlockRequired = true;
+            // lowerTetrisPieceFlag = false;
+            break;
+        }
+    }
+    // if (lowerTetrisPieceFlag) {
+        currentBlock.centerOfRotation[1]--;
+    // }
+    // lowerTetrisPieceFlag = true;
+    // console.log(currentBlock.centerOfRotation);
 }
 
 var newBlockRequired = true;
@@ -302,9 +325,18 @@ function selectCurrentBlock() {
 
         var randomStyleInt = Math.floor(Math.random() * selectedBlock.styles.length);
 
+        currentBlock.orientation = selectedBlock.styles[randomStyleInt].orientation;
+
+        for (var i = 0; i < currentBlock.orientation.length; i++) {
+            console.log(currentBlock.orientation[i][1]);
+            if (currentBlock.orientation[i][1] >= 1) {
+                console.log("OUTISDE");
+                initialLocation = [randInitialX, 18];
+                break;
+            }
+        }
         currentBlock.type = selectedBlock.type;
         currentBlock.centerOfRotation = initialLocation;
-        currentBlock.orientation = selectedBlock.styles[randomStyleInt].orientation;
         currentBlock.color = selectedBlock.color;
         currentBlock.location = [];
         currentBlock.cornerCoordinates = [];
@@ -395,10 +427,10 @@ function render() {
     gl.clear( gl.COLOR_BUFFER_BIT );
 
     selectCurrentBlock();
-
+    checkStackCollision();
     drawCurrentBlock();
 
-    checkStackCollision();
+
     drawGameBoard();
 
     drawGridLines();
@@ -410,14 +442,36 @@ function checkStackCollision() {
     for (var coordinates in currentBlock.location) {
         var xCoord = currentBlock.location[coordinates][0];
         var yCoord = currentBlock.location[coordinates][1];
+        if (gameBoardState[xCoord][yCoord].occupied === undefined) {
+            console.log("ERROR");
+        }
+
+        if (gameBoardState[xCoord][yCoord].occupied === true) {
+            for (var coordinates in currentBlock.location) {
+                var xCoord = currentBlock.location[coordinates][0];
+                var yCoord = currentBlock.location[coordinates][1] + 1;
+
+                if (gameBoardState[xCoord][yCoord].occupied === undefined) {
+                    console.log("ERROR");
+                }
+                gameBoardState[xCoord][yCoord].occupied = true;
+                gameBoardState[xCoord][yCoord].color = currentBlock.color;
+            }
+
+            newBlockRequired = true;
+
+            break;
+        }
 
         // Check to see if tetrimino hits the floor
-        if (yCoord == 0) {
+        if (yCoord <= 0) {
             // Update gameboard to include tetrimino piece
             for (var coordinates in currentBlock.location) {
                 var xCoord = currentBlock.location[coordinates][0];
                 var yCoord = currentBlock.location[coordinates][1];
-                
+                if (gameBoardState[xCoord][yCoord].occupied === undefined) {
+                    console.log("ERROR");
+                }
                 gameBoardState[xCoord][yCoord].occupied = true;
                 gameBoardState[xCoord][yCoord].color = currentBlock.color;
             }
