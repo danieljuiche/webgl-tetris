@@ -30,9 +30,20 @@ for (var i = 0; i <= numberOfCols; i++) {
     gridVertices.push(vec2(-1+padding + i*colGridSpacing, -1+padding));
 }
 
+var gameInterval;
+
+var defaultGameSpeed = 600;
+var increasedGameSpeed = 100;
+
+// Takes speed of game in parameter
+function setGameSpeed(speed) {
+    clearInterval(gameInterval);
+    gameInterval = window.setInterval(lowerTetrisPiece, speed);
+}
 
 // Set up timer
-window.setInterval(lowerTetrisPiece, 700);
+setGameSpeed(defaultGameSpeed);
+
 function lowerTetrisPiece() {
     for (var coordinates in currentBlock.location) {
         var xCoord = currentBlock.location[coordinates][0];
@@ -60,11 +71,21 @@ function lowerTetrisPiece() {
 }
 
 
-window.addEventListener("keydown", getKey, false);
+window.addEventListener("keyup", getUpKey, false);
 
-function getKey (key) {
+function getUpKey (key) {
     if (key.key === "ArrowDown") {
-        console.log(currentBlock.type);
+        setGameSpeed(defaultGameSpeed);
+    }
+}
+
+window.addEventListener("keydown", getDownKey, false);
+
+function getDownKey (key) {
+    if (key.key === "ArrowDown") {
+        setGameSpeed(increasedGameSpeed);
+    }
+    if (key.key === "ArrowUp") {
         tetriminoPieces.forEach(function(piece) {
             if (piece.type === currentBlock.type) {
                 var newStyleNum = (currentBlock.styleNum + 1) % piece.styles.length;
@@ -72,12 +93,19 @@ function getKey (key) {
                 currentBlock.styleNum = newStyleNum;
             }
         });
-        console.log("Key pressed");
     }
+    if (key.key === "ArrowLeft") {
+        var xCoord = currentBlock.centerOfRotation[0];
+        var yCoord = currentBlock.centerOfRotation[1];
+        currentBlock.centerOfRotation[0]--;
 
-    // if (key.key === "ArrowUp") {
-        
-    // }
+    }
+    if (key.key === "ArrowRight") {
+        var xCoord = currentBlock.centerOfRotation[0];
+        var yCoord = currentBlock.centerOfRotation[1];
+
+        currentBlock.centerOfRotation[0]++;
+    }
 }
 
 
