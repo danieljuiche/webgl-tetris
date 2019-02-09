@@ -34,6 +34,7 @@ var gameInterval;
 
 var defaultGameSpeed = 600;
 var increasedGameSpeed = 100;
+var increaseGameSpeedFlag = false;
 
 // Takes speed of game in parameter
 function setGameSpeed(speed) {
@@ -76,14 +77,16 @@ window.addEventListener("keyup", getUpKey, false);
 function getUpKey (key) {
     if (key.key === "ArrowDown") {
         setGameSpeed(defaultGameSpeed);
+        increaseGameSpeedFlag = false;
     }
 }
 
 window.addEventListener("keydown", getDownKey, false);
 
 function getDownKey (key) {
-    if (key.key === "ArrowDown") {
+    if (key.key === "ArrowDown" && !increaseGameSpeedFlag) {
         setGameSpeed(increasedGameSpeed);
+        increaseGameSpeedFlag = true;
     }
     if (key.key === "ArrowUp") {
         tetriminoPieces.forEach(function(piece) {
@@ -97,16 +100,34 @@ function getDownKey (key) {
     if (key.key === "ArrowLeft") {
         var xCoord = currentBlock.centerOfRotation[0];
         var yCoord = currentBlock.centerOfRotation[1];
-        currentBlock.centerOfRotation[0]--;
+
+        console.log(currentBlock.orientation);
+
+        if (!checkWallCollision(currentBlock.orientation, "ArrowLeft")) {
+            currentBlock.centerOfRotation[0]--;
+        }
 
     }
     if (key.key === "ArrowRight") {
         var xCoord = currentBlock.centerOfRotation[0];
         var yCoord = currentBlock.centerOfRotation[1];
 
-        currentBlock.centerOfRotation[0]++;
+        if (!checkWallCollision(currentBlock.orientation, "ArrowRight")) {
+            currentBlock.centerOfRotation[0]++;
+        }
     }
 }
+
+// Find current style location based on type.
+// function getCurrentStyleLocations () {
+//     tetriminoPieces.forEach(function(piece) {
+//         if (piece.type === currentBlock.type) {
+//             currentBlock.styleNum = newStyleNum;
+//             return currentBlock.O
+//         }
+//     });
+// }
+
 
 
 var newBlockRequired = true;
@@ -487,6 +508,30 @@ function render() {
 
     drawGridLines();
     window.requestAnimFrame(render);
+}
+
+function checkWallCollision(blockOrientations, keyPress) {
+    var currentXCoord = currentBlock.centerOfRotation[0];
+    var currentYCoord = currentBlock.centerOfRotation[1];
+
+    var keyPressXCoord = 0;
+    var keyPressYCoord = 0;
+
+    if (keyPress === "ArrowLeft") {
+        keyPressXCoord = -1;
+    }
+    if (keyPress === "ArrowRight") {
+        keyPressXCoord = 1;
+    }
+
+    for (var coordinates in blockOrientations) {
+        var testXCoordinate = blockOrientations[coordinates][0] + currentXCoord + keyPressXCoord;
+        var testYCoordinate = blockOrientations[coordinates][1] + currentYCoord + keyPressYCoord;;
+        if (testXCoordinate < 0 || testXCoordinate >= numberOfCols) {
+            return true;
+        }
+    }
+    return false;
 }
 
 function checkStackCollision() {
