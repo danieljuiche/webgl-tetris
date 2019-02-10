@@ -56,8 +56,10 @@ function lowerTetrisPiece() {
                 var xCoord = currentBlock.location[coordinates][0];
                 var yCoord = currentBlock.location[coordinates][1];
 
-                gameBoardState[xCoord][yCoord].occupied = true;
-                gameBoardState[xCoord][yCoord].color = currentBlock.color;
+                if (gameBoardState[xCoord][yCoord]!== undefined) {
+                    gameBoardState[xCoord][yCoord].occupied = true;
+                    gameBoardState[xCoord][yCoord].color = currentBlock.color;
+                }
             }
 
             desiredSpaceOccupied = true;
@@ -127,12 +129,13 @@ function checkPieceCollision(blockOrientations) {
         var testXCoordinate = blockOrientations[coordinates][0] + currentXCoord;
         var testYCoordinate = blockOrientations[coordinates][1] + currentYCoord;
 
+        if (gameBoardState[testXCoordinate][testYCoordinate] === undefined) {
+            return true;
+        }
+
         if (gameBoardState[testXCoordinate][testYCoordinate].occupied === true) {
             return true;
         } 
-        // if (testXCoordinate < 0 || testXCoordinate >= numberOfCols) {
-        //     return true;
-        // }
     }
     return false;
 }
@@ -388,8 +391,8 @@ function selectCurrentBlock() {
     if (newBlockRequired) {
         // Display it in random location
         var randInitialX = 2 + Math.floor(Math.random() * (numberOfCols - 3));
-
-        var initialLocation = [randInitialX, 19];
+        var initialY = 19;
+        var initialLocation = [randInitialX, initialY];
 
         // Randomly select piece
         var randPieceInt = Math.floor(Math.random() * tetriminoPieces.length);
@@ -402,13 +405,39 @@ function selectCurrentBlock() {
 
         for (var i = 0; i < currentBlock.orientation.length; i++) {
             if (currentBlock.orientation[i][1] >= 1) {
-                initialLocation = [randInitialX, 18];
+                initialLocation = [randInitialX, initialY--];
                 break;
             }
         }
 
-        currentBlock.type = selectedBlock.type;
         currentBlock.centerOfRotation = initialLocation;
+
+
+        var moveUpFlag = true;
+        while (moveUpFlag) {
+            var counter = 0;
+            for (var blockSpace in currentBlock.orientation) {
+                var testXCoord = currentBlock.centerOfRotation[0] + currentBlock.orientation[blockSpace][0];
+                var testYCoord = currentBlock.centerOfRotation[1] + currentBlock.orientation[blockSpace][1];
+
+                if (gameBoardState[testXCoord][testYCoord] !== undefined) {
+                    if (gameBoardState[testXCoord][testYCoord].occupied === true) {
+                        initialLocation = [randInitialX, initialY++]
+                    } else {
+                        moveUpFlag = false;
+                        break;
+                    }
+                } else {
+                    counter++;
+                }
+            }
+            if (counter >= currentBlock.orientation.length) {
+                moveUpFlag = false;
+            }
+        }
+
+
+        currentBlock.type = selectedBlock.type;
         currentBlock.color = selectedBlock.color;
         currentBlock.location = [];
         currentBlock.cornerCoordinates = [];
@@ -418,7 +447,6 @@ function selectCurrentBlock() {
         newBlockRequired = false;
     }
 }
-
 
 function convertCornerCoords(x, y) {
     var xCoord = (x/numberOfCols * 1) + ((numberOfCols - x)/(numberOfCols) * -1);
@@ -499,10 +527,10 @@ window.onload = function init() {
 
 function render() {
     gl.clear( gl.COLOR_BUFFER_BIT );
-
+    checkGameOver();
     selectCurrentBlock();
     checkStackCollision();
-    checkGameOver();
+
     drawCurrentBlock();
 
     drawGameBoard();
@@ -511,10 +539,40 @@ function render() {
     window.requestAnimFrame(render);
 }
 
+function restartGame() {
+    newBlockRequired = true;
+    gameBoardState = [];
+    currentBlock = {};
+    selectedBlock = {};
+
+    for (var i = 0; i < numberOfCols; i++) {
+        var tempArray = [];
+        for (var j = 0; j < numberOfRows; j++) {
+            tempArray.push({
+                occupied: false,
+                color: vec4(Math.random(), Math.random(), Math.random(), 1.0),
+                location: [i,j],
+                cornerCoordinates: [
+                    convertCornerCoords(i,j),
+                    convertCornerCoords(i, j+1),
+                    convertCornerCoords(i+1, j+1),
+                    convertCornerCoords(i,j),
+                    convertCornerCoords(i+1, j+1),
+                    convertCornerCoords(i+1, j)
+                ]
+            });
+        }
+        gameBoardState.push(tempArray);
+    }
+
+    selectCurrentBlock();
+}
+
 function checkGameOver() {
     for (var i = 0; i < numberOfCols; i++) {
         if (gameBoardState[i][numberOfRows-1].occupied === true) {
-            alert("Check Game Over! GAME OVER!");
+            alert("GameOver!");
+            restartGame();
             break;
         }
     }
@@ -537,7 +595,10 @@ function checkWallCollision(blockOrientations, keyPress) {
     for (var coordinates in blockOrientations) {
         var testXCoord = blockOrientations[coordinates][0] + currentXCoord + keyPressXCoord;
         var testYCoord = blockOrientations[coordinates][1] + currentYCoord + keyPressYCoord;
-        if (testXCoord < 0 || testXCoord >= numberOfCols || gameBoardState[testXCoord][testYCoord].occupied === true) {
+        if (testXCoord < 0 || testXCoord >= numberOfCols) {
+            return true;
+        }
+        if (gameBoardState[testXCoord][testYCoord] !== undefined && gameBoardState[testXCoord][testYCoord].occupied === true) {
             return true;
         }
     }
@@ -550,13 +611,15 @@ function checkStackCollision() {
         var xCoord = currentBlock.location[coordinates][0];
         var yCoord = currentBlock.location[coordinates][1];
 
-        if (gameBoardState[xCoord][yCoord].occupied === true) {
+        if (gameBoardState[xCoord][yCoord] !== undefined && gameBoardState[xCoord][yCoord].occupied === true) {
             for (var coordinates in currentBlock.location) {
                 var xCoord = currentBlock.location[coordinates][0];
                 var yCoord = currentBlock.location[coordinates][1] + 1;
 
-                gameBoardState[xCoord][yCoord].occupied = true;
-                gameBoardState[xCoord][yCoord].color = currentBlock.color;
+                if (gameBoardState[xCoord][yCoord] !== undefined) {
+                    gameBoardState[xCoord][yCoord].occupied = true;
+                    gameBoardState[xCoord][yCoord].color = currentBlock.color;
+                }
             }
 
             newBlockRequired = true;
