@@ -85,6 +85,13 @@ function getUpKey (key) {
 window.addEventListener("keydown", getDownKey, false);
 
 function getDownKey (key) {
+    if (key.key === "q") {
+        window.close();
+    }
+
+    if (key.key === "r") {
+        restartGame();
+    }
     if (key.key === "ArrowDown" && !increaseGameSpeedFlag) {
         increaseGameSpeedFlag = true;
         lowerTetrisPiece();
@@ -540,6 +547,9 @@ function render() {
 }
 
 function restartGame() {
+    setGameSpeed(defaultGameSpeed);
+    increaseGameSpeedFlag = false;
+    
     newBlockRequired = true;
     gameBoardState = [];
     currentBlock = {};
@@ -634,8 +644,10 @@ function checkStackCollision() {
                 var xCoord = currentBlock.location[coordinates][0];
                 var yCoord = currentBlock.location[coordinates][1];
 
-                gameBoardState[xCoord][yCoord].occupied = true;
-                gameBoardState[xCoord][yCoord].color = currentBlock.color;
+                if (gameBoardState[xCoord][yCoord] !== undefined) {
+                    gameBoardState[xCoord][yCoord].occupied = true;
+                    gameBoardState[xCoord][yCoord].color = currentBlock.color;
+                }
             }
 
             newBlockRequired = true;
