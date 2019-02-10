@@ -92,8 +92,10 @@ function getDownKey (key) {
         tetriminoPieces.forEach(function(piece) {
             if (piece.type === currentBlock.type) {
                 var newStyleNum = (currentBlock.styleNum + 1) % piece.styles.length;
-                currentBlock.orientation = selectedBlock.styles[newStyleNum].orientation;
-                currentBlock.styleNum = newStyleNum;
+                if (!checkPieceCollision(selectedBlock.styles[newStyleNum].orientation)) {
+                    currentBlock.orientation = selectedBlock.styles[newStyleNum].orientation;
+                    currentBlock.styleNum = newStyleNum;
+                }
             }
         });
     }
@@ -118,6 +120,24 @@ function getDownKey (key) {
     }
 }
 
+
+function checkPieceCollision(blockOrientations) {
+    var currentXCoord = currentBlock.centerOfRotation[0];
+    var currentYCoord = currentBlock.centerOfRotation[1];
+
+    for (var coordinates in blockOrientations) {
+        var testXCoordinate = blockOrientations[coordinates][0] + currentXCoord;
+        var testYCoordinate = blockOrientations[coordinates][1] + currentYCoord;
+
+        if (gameBoardState[testXCoordinate][testYCoordinate].occupied === true) {
+            return true;
+        } 
+        // if (testXCoordinate < 0 || testXCoordinate >= numberOfCols) {
+        //     return true;
+        // }
+    }
+    return false;
+}
 // Find current style location based on type.
 // function getCurrentStyleLocations () {
 //     tetriminoPieces.forEach(function(piece) {
@@ -152,12 +172,6 @@ for (var i = 0; i < numberOfCols; i++) {
     }
     gameBoardState.push(tempArray);
 }
-
-// Testing game board
-// gameBoardState[0][0].color = vec4(1,1,1,1);
-// gameBoardState[1][2].color = vec4(1,1,1,1);
-// gameBoardState[4][3].color = vec4(1,1,1,1);
-
 
 // ...................... //
 // Tetrimino Orientations //
@@ -526,7 +540,7 @@ function checkWallCollision(blockOrientations, keyPress) {
 
     for (var coordinates in blockOrientations) {
         var testXCoordinate = blockOrientations[coordinates][0] + currentXCoord + keyPressXCoord;
-        var testYCoordinate = blockOrientations[coordinates][1] + currentYCoord + keyPressYCoord;;
+        var testYCoordinate = blockOrientations[coordinates][1] + currentYCoord + keyPressYCoord;
         if (testXCoordinate < 0 || testXCoordinate >= numberOfCols) {
             return true;
         }
