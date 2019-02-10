@@ -46,6 +46,7 @@ function setGameSpeed(speed) {
 setGameSpeed(defaultGameSpeed);
 
 function lowerTetrisPiece() {
+    var desiredSpaceOccupied = false;
     for (var coordinates in currentBlock.location) {
         var xCoord = currentBlock.location[coordinates][0];
         var yCoord = currentBlock.location[coordinates][1];
@@ -59,16 +60,14 @@ function lowerTetrisPiece() {
                 gameBoardState[xCoord][yCoord].color = currentBlock.color;
             }
 
+            desiredSpaceOccupied = true;
             newBlockRequired = true;
-            // lowerTetrisPieceFlag = false;
             break;
         }
     }
-    // if (lowerTetrisPieceFlag) {
-    currentBlock.centerOfRotation[1]--;
-    // }
-    // lowerTetrisPieceFlag = true;
-    // console.log(currentBlock.centerOfRotation);
+    if (!desiredSpaceOccupied === true) {
+        currentBlock.centerOfRotation[1]--;
+    }
 }
 
 
@@ -85,9 +84,9 @@ window.addEventListener("keydown", getDownKey, false);
 
 function getDownKey (key) {
     if (key.key === "ArrowDown" && !increaseGameSpeedFlag) {
+        increaseGameSpeedFlag = true;
         lowerTetrisPiece();
         setGameSpeed(increasedGameSpeed);
-        increaseGameSpeedFlag = true;
     }
     if (key.key === "ArrowUp") {
         tetriminoPieces.forEach(function(piece) {
@@ -137,17 +136,6 @@ function checkPieceCollision(blockOrientations) {
     }
     return false;
 }
-// Find current style location based on type.
-// function getCurrentStyleLocations () {
-//     tetriminoPieces.forEach(function(piece) {
-//         if (piece.type === currentBlock.type) {
-//             currentBlock.styleNum = newStyleNum;
-//             return currentBlock.O
-//         }
-//     });
-// }
-
-
 
 var newBlockRequired = true;
 var gameBoardState = [];
@@ -425,6 +413,8 @@ function selectCurrentBlock() {
         currentBlock.location = [];
         currentBlock.cornerCoordinates = [];
 
+        checkStackCollision();
+
         newBlockRequired = false;
     }
 }
@@ -512,13 +502,22 @@ function render() {
 
     selectCurrentBlock();
     checkStackCollision();
+    checkGameOver();
     drawCurrentBlock();
-
 
     drawGameBoard();
 
     drawGridLines();
     window.requestAnimFrame(render);
+}
+
+function checkGameOver() {
+    for (var i = 0; i < numberOfCols; i++) {
+        if (gameBoardState[i][numberOfRows-1].occupied === true) {
+            alert("Check Game Over! GAME OVER!");
+            break;
+        }
+    }
 }
 
 function checkWallCollision(blockOrientations, keyPress) {
@@ -550,18 +549,12 @@ function checkStackCollision() {
     for (var coordinates in currentBlock.location) {
         var xCoord = currentBlock.location[coordinates][0];
         var yCoord = currentBlock.location[coordinates][1];
-        if (gameBoardState[xCoord][yCoord].occupied === undefined) {
-            console.log("ERROR");
-        }
 
         if (gameBoardState[xCoord][yCoord].occupied === true) {
             for (var coordinates in currentBlock.location) {
                 var xCoord = currentBlock.location[coordinates][0];
                 var yCoord = currentBlock.location[coordinates][1] + 1;
 
-                if (gameBoardState[xCoord][yCoord].occupied === undefined) {
-                    console.log("ERROR");
-                }
                 gameBoardState[xCoord][yCoord].occupied = true;
                 gameBoardState[xCoord][yCoord].color = currentBlock.color;
             }
@@ -577,9 +570,7 @@ function checkStackCollision() {
             for (var coordinates in currentBlock.location) {
                 var xCoord = currentBlock.location[coordinates][0];
                 var yCoord = currentBlock.location[coordinates][1];
-                if (gameBoardState[xCoord][yCoord].occupied === undefined) {
-                    console.log("ERROR");
-                }
+
                 gameBoardState[xCoord][yCoord].occupied = true;
                 gameBoardState[xCoord][yCoord].color = currentBlock.color;
             }
