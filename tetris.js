@@ -139,6 +139,10 @@ function checkPieceCollision(blockOrientations) {
         var testXCoordinate = blockOrientations[coordinates][0] + currentXCoord;
         var testYCoordinate = blockOrientations[coordinates][1] + currentYCoord;
 
+        if (gameBoardState[testXCoordinate] === undefined) {
+            return true;
+        }
+
         if (gameBoardState[testXCoordinate][testYCoordinate] === undefined) {
             return true;
         }
@@ -544,6 +548,7 @@ function render() {
         checkStackCollision();
 
         drawCurrentBlock();
+        checkLineClears();
     }
 
 
@@ -567,7 +572,7 @@ function restartGame() {
         for (var j = 0; j < numberOfRows; j++) {
             tempArray.push({
                 occupied: false,
-                color: vec4(Math.random(), Math.random(), Math.random(), 1.0),
+                color: vec4(0, 0, 0, 1.0),
                 location: [i,j],
                 cornerCoordinates: [
                     convertCornerCoords(i,j),
@@ -665,6 +670,32 @@ function checkStackCollision() {
     }
 }
 
+function checkLineClears() {
+    for (var i = 0; i < numberOfRows; i++) {
+        var gridCounter = 0;
+        for (var j = 0; j < numberOfCols; j++) {
+            var gridSpot = gameBoardState[j][i];
+            // console.log(gridSpot);
+            if (gridSpot.occupied === true) {
+                gridCounter++;
+                // console.log(gridCounter);
+            }
+
+            if (gridCounter === numberOfCols) {
+                console.log("Row Filled!");
+                // Clear row
+                for (var k = 0; k < numberOfCols; k++) {
+                    // Move all other rows down
+                    for (var startingRow = i; startingRow < numberOfRows-1; startingRow++) {
+                        gameBoardState[k][startingRow].occupied = gameBoardState[k][startingRow+1].occupied;
+                        gameBoardState[k][startingRow].color = gameBoardState[k][startingRow+1].color;
+                    }
+                }
+
+            }
+        }
+    }
+}
 function drawGameBoard() {
     for (var i = 0; i < numberOfCols; i++) {
         for (var j = 0; j < numberOfRows; j++) {
