@@ -34,13 +34,18 @@ for (var i = 0; i <= numberOfCols; i++) {
 var gameInterval;
 
 var defaultGameSpeed = 600;
+var currentGameSpeed = defaultGameSpeed;
 var increasedGameSpeed = 100;
+var changeGameSpeed = 100;
 var increaseGameSpeedFlag = false;
+
+var allowChangeSpeed = true;
 
 // Takes speed of game in parameter
 function setGameSpeed(speed) {
-    clearInterval(gameInterval);
-    gameInterval = window.setInterval(lowerTetrisPiece, speed);
+        clearInterval(gameInterval);
+        console.log("Setting interval to " + speed);
+        gameInterval = window.setInterval(lowerTetrisPiece, speed);
 }
 
 // Set up timer
@@ -78,7 +83,7 @@ window.addEventListener("keyup", getUpKey, false);
 
 function getUpKey (key) {
     if (key.key === "ArrowDown" && increaseGameSpeedFlag) {
-        setGameSpeed(defaultGameSpeed);
+        setGameSpeed(currentGameSpeed);
         increaseGameSpeedFlag = false;
     }
 }
@@ -101,6 +106,25 @@ function getDownKey (key) {
         lowerTetrisPiece();
         setGameSpeed(increasedGameSpeed);
     }
+
+    if (key.key === "j") {
+        if (currentGameSpeed > 100) {
+            currentGameSpeed -= changeGameSpeed;
+            if (allowChangeSpeed) {
+                setGameSpeed(currentGameSpeed);   
+            }
+        }
+    }
+
+    if (key.key === "k") {
+        if (currentGameSpeed < 1200) {
+            currentGameSpeed += changeGameSpeed;
+            if (allowChangeSpeed) {
+                setGameSpeed(currentGameSpeed);
+            }
+        }
+    }
+
     if (key.key === "ArrowUp") {
         tetriminoPieces.forEach(function(piece) {
             if (piece.type === currentBlock.type) {
@@ -559,6 +583,7 @@ function render() {
 }
 
 function restartGame() {
+    currentGameSpeed = defaultGameSpeed;
     setGameSpeed(defaultGameSpeed);
     increaseGameSpeedFlag = false;
 
