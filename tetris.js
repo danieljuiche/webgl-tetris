@@ -18,6 +18,7 @@ var rowGridSpacing = (2 - padding * 2) / numberOfRows;
 var colGridSpacing = (2 - padding * 2) / numberOfCols;
 
 var lowerTetrisPieceFlag = true;
+var gameTerminatedFlag = false;
 
 // Draw grid
 for (var i = 0; i <= numberOfRows; i++) {
@@ -86,10 +87,13 @@ window.addEventListener("keydown", getDownKey, false);
 
 function getDownKey (key) {
     if (key.key === "q") {
-        window.close();
+        restartGame();
+        gameTerminatedFlag = true;
+        newBlockRequired = false;
     }
 
     if (key.key === "r") {
+        gameTerminatedFlag = false;
         restartGame();
     }
     if (key.key === "ArrowDown" && !increaseGameSpeedFlag) {
@@ -126,7 +130,6 @@ function getDownKey (key) {
         }
     }
 }
-
 
 function checkPieceCollision(blockOrientations) {
     var currentXCoord = currentBlock.centerOfRotation[0];
@@ -535,10 +538,14 @@ window.onload = function init() {
 function render() {
     gl.clear( gl.COLOR_BUFFER_BIT );
     checkGameOver();
-    selectCurrentBlock();
-    checkStackCollision();
+    if (!gameTerminatedFlag) {
+        selectCurrentBlock();
 
-    drawCurrentBlock();
+        checkStackCollision();
+
+        drawCurrentBlock();
+    }
+
 
     drawGameBoard();
 
@@ -549,7 +556,7 @@ function render() {
 function restartGame() {
     setGameSpeed(defaultGameSpeed);
     increaseGameSpeedFlag = false;
-    
+
     newBlockRequired = true;
     gameBoardState = [];
     currentBlock = {};
@@ -574,8 +581,9 @@ function restartGame() {
         }
         gameBoardState.push(tempArray);
     }
-
-    selectCurrentBlock();
+    if (!gameTerminatedFlag) {
+        selectCurrentBlock();
+    }
 }
 
 function checkGameOver() {
