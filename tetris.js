@@ -65,7 +65,7 @@ function lowerTetrisPiece() {
         }
     }
     // if (lowerTetrisPieceFlag) {
-        currentBlock.centerOfRotation[1]--;
+    currentBlock.centerOfRotation[1]--;
     // }
     // lowerTetrisPieceFlag = true;
     // console.log(currentBlock.centerOfRotation);
@@ -75,7 +75,7 @@ function lowerTetrisPiece() {
 window.addEventListener("keyup", getUpKey, false);
 
 function getUpKey (key) {
-    if (key.key === "ArrowDown") {
+    if (key.key === "ArrowDown" && increaseGameSpeedFlag) {
         setGameSpeed(defaultGameSpeed);
         increaseGameSpeedFlag = false;
     }
@@ -85,6 +85,7 @@ window.addEventListener("keydown", getDownKey, false);
 
 function getDownKey (key) {
     if (key.key === "ArrowDown" && !increaseGameSpeedFlag) {
+        lowerTetrisPiece();
         setGameSpeed(increasedGameSpeed);
         increaseGameSpeedFlag = true;
     }
@@ -102,8 +103,6 @@ function getDownKey (key) {
     if (key.key === "ArrowLeft") {
         var xCoord = currentBlock.centerOfRotation[0];
         var yCoord = currentBlock.centerOfRotation[1];
-
-        console.log(currentBlock.orientation);
 
         if (!checkWallCollision(currentBlock.orientation, "ArrowLeft")) {
             currentBlock.centerOfRotation[0]--;
@@ -414,9 +413,7 @@ function selectCurrentBlock() {
         currentBlock.styleNum = randomStyleInt;
 
         for (var i = 0; i < currentBlock.orientation.length; i++) {
-            console.log(currentBlock.orientation[i][1]);
             if (currentBlock.orientation[i][1] >= 1) {
-                console.log("OUTISDE");
                 initialLocation = [randInitialX, 18];
                 break;
             }
@@ -539,9 +536,9 @@ function checkWallCollision(blockOrientations, keyPress) {
     }
 
     for (var coordinates in blockOrientations) {
-        var testXCoordinate = blockOrientations[coordinates][0] + currentXCoord + keyPressXCoord;
-        var testYCoordinate = blockOrientations[coordinates][1] + currentYCoord + keyPressYCoord;
-        if (testXCoordinate < 0 || testXCoordinate >= numberOfCols) {
+        var testXCoord = blockOrientations[coordinates][0] + currentXCoord + keyPressXCoord;
+        var testYCoord = blockOrientations[coordinates][1] + currentYCoord + keyPressYCoord;
+        if (testXCoord < 0 || testXCoord >= numberOfCols || gameBoardState[testXCoord][testYCoord].occupied === true) {
             return true;
         }
     }
