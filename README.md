@@ -1,6 +1,8 @@
 # webgl-tetris
 
-## This is a tetris game made using WebGL as part of CMPT 361 - Introduction to Graphics.
+This is a tetris game made using WebGL as part of CMPT 361 - Introduction to Graphics.
+
+## Keys:
 
 Controls (Arrow Keys)
 
